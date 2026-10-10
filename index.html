@@ -371,8 +371,9 @@ function h(tag, attrs = {}, ...kids) {
 }
 
 /* ---------- Version ---------- */
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.2.1';
 const CHANGELOG = [
+  { v: '1.2.1', items: ['Wand-Werkzeug: neuer 90°-Schalter für gerade Wände (standardmäßig an, auch am Handy)'] },
   { v: '1.2.0', items: ['Hauptmenü mit allen Projekten, Vorschaubildern und Vorlagen („Haus nach Maß“)',
     'Neues, modernes Design mit Hell-/Dunkelmodus', 'Voll am Handy bedienbar: Touch-Zoom mit zwei Fingern, Seitenleiste von unten, Joystick im Rundgang',
     'Messen erzeugt jetzt sichtbare Bemaßungen mit Maßzahl direkt im Plan', 'Wandlänge & Richtung per Eingabefeld (auch ohne Tastatur)',
@@ -541,11 +542,11 @@ function newFloor(name, elevation = 0, height = 2.6) {
 }
 function newProject(name = 'Mein Haus') {
   return { id: uid(), name, version: 1, created: Date.now(), floors: [newFloor('Erdgeschoss')], links: [],
-    settings: { grid: 0.05, wallThickness: 0.24, showDims: true, showGhost: true } };
+    settings: { grid: 0.05, wallThickness: 0.24, showDims: true, showGhost: true, ortho: true } };
 }
 function normalize(p) {
   p.id = p.id || uid();
-  p.settings = Object.assign({ grid: 0.05, wallThickness: 0.24, showDims: true, showGhost: true }, p.settings || {});
+  p.settings = Object.assign({ grid: 0.05, wallThickness: 0.24, showDims: true, showGhost: true, ortho: true }, p.settings || {});
   p.links = p.links || [];
   if (!p.floors || !p.floors.length) p.floors = [newFloor('Erdgeschoss')];
   for (const f of p.floors) for (const k of ['nodes', 'walls', 'openings', 'rooms', 'items', 'dims']) f[k] = f[k] || [];
@@ -1277,8 +1278,10 @@ function wallSnap(f) {
   // exakte Eingabe
   const dir0 = { x: p.x - s0.x, y: p.y - s0.y };
   let ang = Math.atan2(dir0.y, dir0.x);
-  const step = keys.shift ? Math.PI / 2 : Math.PI / 4, sn = Math.round(ang / step) * step;
-  if (keys.shift || Math.abs(ang - sn) < 4 * Math.PI / 180) ang = sn;
+  // 90°-Modus: Schalter im Wand-Werkzeug; Shift kehrt ihn kurzzeitig um
+  const ortho = (project.settings.ortho !== false) !== keys.shift;
+  const step = ortho ? Math.PI / 2 : Math.PI / 4, sn = Math.round(ang / step) * step;
+  if (ortho || Math.abs(ang - sn) < 4 * Math.PI / 180) ang = sn;
   const d = { x: Math.cos(ang), y: Math.sin(ang) };
   if (draft.typed) {
     const L = parseFloat(draft.typed.replace(',', '.')) || 0;
@@ -1287,7 +1290,7 @@ function wallSnap(f) {
   // Knoten haben Vorrang
   for (const n of f.nodes) if (dist(n, p) < tol) return { x: n.x, y: n.y, nodeId: n.id };
   let L = (p.x - s0.x) * d.x + (p.y - s0.y) * d.y;
-  const locked = Math.abs(ang - Math.atan2(dir0.y, dir0.x)) > 1e-9 || keys.shift || Math.abs(Math.sin(ang * 2)) < 1e-6;
+  const locked = Math.abs(ang - Math.atan2(dir0.y, dir0.x)) > 1e-9 || ortho || Math.abs(Math.sin(ang * 2)) < 1e-6;
   if (!locked) L = Math.hypot(dir0.x, dir0.y);
   let q = { x: s0.x + d.x * L, y: s0.y + d.y * L };
   // Strahl trifft Wand?
@@ -1629,7 +1632,7 @@ window.addEventListener('keyup', e => {
 const TOOLS = [
   { id: 'select', label: 'Auswahl', key: 'v', hint: 'Element anklicken & ziehen · Leere Fläche ziehen = verschieben · Mausrad = Zoom · Entf = löschen · Q/E = drehen',
     mhint: 'Antippen = auswählen · Ziehen = verschieben · 2 Finger = zoomen' },
-  { id: 'wall', label: 'Wand', key: 'w', hint: 'Klicken = Punkte setzen · Zahl tippen + Enter = exakte Länge · Shift = 90° · Doppelklick/Esc/Rechtsklick = beenden',
+  { id: 'wall', label: 'Wand', key: 'w', hint: 'Klicken = Punkte setzen · Zahl tippen + Enter = exakte Länge · 90°-Schalter = nur gerade Wände (Shift kehrt um) · Doppelklick/Esc/Rechtsklick = beenden',
     mhint: 'Startpunkt antippen, dann Endpunkt – oder Länge eingeben' },
   { id: 'room', label: 'Raum', key: 'r', hint: 'In geschlossenen Bereich klicken = Raum wird automatisch erkannt · Alt+Klick = Polygon frei zeichnen',
     mhint: 'In einen von Wänden umschlossenen Bereich tippen' },
@@ -1668,6 +1671,10 @@ function renderToolOpts() {
     sel.value = cur ? cur[0] : project.settings.wallThickness;
     sel.onchange = () => { project.settings.wallThickness = parseFloat(sel.value); commit(); requestDraw(); };
     el.append(h('span', { class: 'muted', style: 'font-size:12.5px' }, 'Stärke'), sel);
+    const orthoOn = project.settings.ortho !== false;
+    const ob = btn('90°', () => { project.settings.ortho = !orthoOn; commit(); renderToolOpts(); requestDraw(); toast(project.settings.ortho ? 'Gerade Wände: nur 90°' : 'Freie Winkel'); }, orthoOn ? 'chip active' : 'chip');
+    ob.title = orthoOn ? 'Gerade Wände (90°) – antippen für freie Winkel' : 'Freie Winkel – antippen für gerade Wände (90°)';
+    el.append(ob);
     if (draft && draft.start) {
       const len = h('input', { type: 'number', step: 0.01, min: 0, placeholder: 'Länge', inputmode: 'decimal' });
       el.append(len, h('span', { class: 'muted' }, 'm'));

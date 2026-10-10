@@ -1,7 +1,7 @@
 // Service Worker: macht die App offline nutzbar.
 // App-Dateien: erst Netz (damit Updates sofort ankommen), sonst Cache.
 // Bibliotheken & Schriften vom CDN: erst Cache, sonst Netz.
-const CACHE = 'grundriss-v1.2.0';
+const CACHE = 'grundriss-v1.2.1';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 const CDN = ['https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js',
   'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/controls/OrbitControls.js',
