@@ -1,12 +1,16 @@
 # Grundrissplaner
 
-Grundriss-App fürs eigene Haus: Wände, Räume, Türen, Fenster und Einrichtung eintragen, Elemente miteinander verknüpfen und alles in 3D ansehen.
+Grundriss-App fürs eigene Haus: Wände, Räume, Türen, Fenster und Einrichtung eintragen, Elemente miteinander verknüpfen und alles in 3D ansehen und begehen. Funktioniert am PC und am Handy.
+
+**Online:** https://ostelai.github.io/Grundrissapp/
 
 ## Starten
 
-`index.html` per Doppelklick im Browser öffnen (Chrome, Edge oder Firefox). Eine Internetverbindung wird für die 3D-Bibliothek (three.js vom CDN) gebraucht.
+- Am einfachsten über den Link oben.
+- Am Handy lässt sich die App über das Menü (⋮) → *Als App installieren* auf den Home-Bildschirm legen. Am iPhone geht das in Safari über *Teilen → Zum Home-Bildschirm*.
+- Nach dem ersten Öffnen läuft sie auch offline.
 
-Alternativ als lokaler Server:
+Lokal geht es auch, mit einem kleinen Server:
 
 ```bash
 python -m http.server 8765
@@ -14,39 +18,53 @@ python -m http.server 8765
 
 Danach http://localhost:8765 öffnen.
 
+## Hauptmenü
+
+Beim Öffnen erscheint das Hauptmenü mit allen deinen Projekten als Vorschaubild. Neue Projekte legst du so an:
+
+- **Haus nach Maß**: Breite, Tiefe, Stockwerke, Außenwand und Keller angeben, dann stehen die Außenwände sofort.
+- **Leeres Projekt**: Du zeichnest alles selbst.
+- **Beispielhaus**: Ein fertiges Haus zum Ausprobieren.
+- **Datei öffnen**: Ein gesichertes Projekt (`.json`) laden.
+
+Über ⋮ an einem Projekt kannst du es umbenennen, duplizieren, sichern oder löschen. Mit dem Haus-Symbol oben links kommst du aus jedem Projekt zurück ins Menü.
+
 ## Bedienung
 
-| Taste | Werkzeug | Funktion |
+| Werkzeug | Taste | Funktion |
 |---|---|---|
-| `V` | Auswahl | Anklicken & ziehen; leere Fläche ziehen = Ansicht verschieben; Mausrad = Zoom |
-| `W` | Wand | Punkte klicken; **Zahl tippen + Enter = exakte Länge**; `Shift` = 90°; Doppelklick/Esc = fertig |
-| `R` | Raum | In einen von Wänden umschlossenen Bereich klicken → Raum wird erkannt (Alt+Klick = frei zeichnen) |
-| `T` / `F` / `G` | Tür / Fenster / Durchgang | Auf eine Wand klicken |
-| `O` | Objekt | Möbel, Sanitär, Küche, Elektro (Steckdose, Schalter, Lampe, Sicherungskasten …) |
-| `L` | Verknüpfen | Zwei Elemente anklicken, z. B. Schalter → Lampe; auch über Stockwerke hinweg |
-| `M` | Messen | Abstand zwischen zwei Punkten |
+| Auswahl | `V` | Anklicken/antippen & ziehen; leere Fläche ziehen = verschieben; Mausrad bzw. zwei Finger = Zoom |
+| Wand | `W` | Punkte setzen. Für eine exakte Länge die Zahl tippen + Enter, oder oben Länge eingeben und Richtung (→ ↓ ← ↑) wählen |
+| Raum | `R` | In einen umschlossenen Bereich klicken; der Raum wird erkannt (Alt+Klick = frei zeichnen) |
+| Tür / Fenster / Durchgang | `T` / `F` / `G` | Auf eine Wand klicken |
+| Objekt | `O` | Möbel, Küche, Bad, Elektro (Steckdose, Schalter, Lampe, Sicherungskasten …), Treppe |
+| Verknüpfen | `L` | Zwei Elemente anklicken, z. B. Schalter → Lampe; geht auch über Stockwerke hinweg |
+| Messen | `M` | Zwei Punkte setzen. Die Bemaßung bleibt mit Maßzahl im Plan stehen |
 
-Weitere Tasten: `Entf` löscht, `Q`/`E` drehen ein Objekt (mit Shift um 90°), `Strg+D` dupliziert, `Strg+Z`/`Strg+Y` für Rückgängig/Wiederholen, `Strg+S` speichert als Datei.
+Weitere Tasten am PC:
 
-**Verknüpfungen im Plan:**
-- Wände hängen an gemeinsamen Eckpunkten. Ziehst du einen Eckpunkt, ziehen alle angeschlossenen Wände mit.
-- Automatisch erkannte Räume hängen an ihren Wänden, Fläche und Form passen sich also mit an.
-- Eigene Verknüpfungen (z. B. Stromkreise oder „schaltet“) kannst du beschriften und einfärben.
+| Taste | Funktion |
+|---|---|
+| `Entf` | Auswahl löschen |
+| `Q` / `E` | Objekt drehen |
+| `Strg+D` | Objekt duplizieren |
+| `Strg+Z` / `Strg+Y` | Rückgängig / Wiederholen |
+| `Strg+S` | Projekt als Datei sichern |
 
-Jedes Element kann **Notizen** und **eigene Angaben** bekommen (z. B. Hersteller, Preis, Einbaudatum).
+**Am Handy:**
+- Unten ist die Werkzeugleiste. Darüber liegt eine Leiste mit Details zum gewählten Element; zum Aufklappen tippst du sie an.
+- Mit zwei Fingern zoomst und verschiebst du den Plan.
+- Doppeltippen beendet eine Wand.
 
-## Rundgang (3D)
+**Jedes Element** kann Fotos (z. B. vom Sicherungskasten), eigene Angaben (Hersteller, Preis, Kaufdatum …) und Notizen bekommen. Angaben mit „Preis“ oder „Kosten“ im Namen werden in der Übersicht zu einer **Kostenübersicht** addiert. Über die **Suche** in der Übersicht findest du jedes Element in allen Stockwerken.
 
-Klick in der 3D-Ansicht auf **🚶 Rundgang**. Du startest im größten Raum, oder beim gerade ausgewählten Element.
+## 3D & Rundgang
 
-- Mit `W` `A` `S` `D` oder den Pfeiltasten läufst du, mit der Maus schaust du dich um. `Shift` lässt dich rennen.
-- Durch Türen und Durchgänge kannst du gehen, durch Wände und Fenster nicht.
-- Treppen kannst du einfach hochlaufen, oben wechselt das Stockwerk automatisch.
-- Im 2D-Plan siehst du deine Position mit Blickrichtung. Ein Doppelklick im Plan oder ein Klick auf einen Stockwerk-Tab bringt dich direkt dorthin.
-- `Esc` pausiert, ein zweites `Esc` beendet den Rundgang.
+- Die 3D-Ansicht zeigt alle Stockwerke. Mit *Schnitt* werden die Wände niedrig angezeigt, so siehst du von oben hinein.
+- **Rundgang** startet die Ego-Perspektive. Am PC läufst du mit `WASD` und schaust mit der Maus. Am Handy läufst du mit dem Joystick links unten und schaust dich durch Wischen um. Treppen führen automatisch ins nächste Stockwerk.
 
 ## Speichern
 
-- Das Projekt wird automatisch im Browser gespeichert.
-- *Datei → Projekt speichern* exportiert es als `.json`, zur Sicherung oder für einen anderen Rechner.
-- Export ist auch als PNG (Grundriss) und als `.glb` (3D-Modell, z. B. für Blender) möglich.
+- Alle Projekte werden automatisch auf dem jeweiligen Gerät gespeichert, im Browser.
+- **Wichtig:** Sichere wichtige Projekte als Datei, über ⋮ → *Projekt sichern (.json)*. Die Datei enthält auch die Fotos. So überträgst du ein Projekt auch vom PC aufs Handy.
+- Exportieren kannst du außerdem den Grundriss als Bild (`.png`) und das 3D-Modell (`.glb`, z. B. für Blender).
